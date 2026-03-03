@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TechSage — AI Ecosystem Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050508;--surface:rgba(255,255,255,.04);--surface2:rgba(255,255,255,.06);
+  --surface3:rgba(255,255,255,.09);--glass:rgba(255,255,255,.03);
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.12);
+  --text:#f0f0f5;--text2:rgba(255,255,255,.55);--text3:rgba(255,255,255,.3);
+  --accent:#7c5cfc;--accent2:#a78bfa;--accent-glow:rgba(124,92,252,.12);
+  --green:#34d399;--orange:#fbbf24;--red:#f87171;--cyan:#22d3ee;--pink:#f472b6;
+  --purple:#c084fc;--blue:#60a5fa;
+  --radius:16px;--radius-sm:10px;
+}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;min-height:100vh}
+body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,92,252,.06) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(34,211,238,.04) 0%,transparent 50%);pointer-events:none;z-index:0}
+a{color:var(--accent2);text-decoration:none}
+
+/* ── Header ── */
+.header{position:sticky;top:0;z-index:100;background:rgba(5,5,8,.7);backdrop-filter:blur(24px) saturate(1.4);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:11px;font-size:19px;font-weight:700;letter-spacing:-.3px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 20px rgba(124,92,252,.3)}
+.header-right{display:flex;align-items:center;gap:14px}
+.header-right .badge{background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:11px;padding:4px 12px;border-radius:20px;font-weight:600;letter-spacing:.02em}
+.user-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 16px;border-radius:24px;cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px;transition:all .2s}
+.user-btn:hover{background:var(--surface3);border-color:var(--border2)}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:3px;padding:10px 28px;background:rgba(5,5,8,.5);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 18px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);white-space:nowrap;transition:all .25s;border:1px solid transparent;display:flex;align-items:center;gap:7px}
+.tab:hover{background:var(--surface2);color:var(--text)}
+.tab.active{background:var(--accent-glow);color:var(--accent2);border-color:rgba(124,92,252,.25);box-shadow:0 0 16px rgba(124,92,252,.08)}
+.tab .count{font-size:10px;background:var(--surface3);padding:2px 7px;border-radius:10px;color:var(--text2);font-weight:600}
+.tab.active .count{background:rgba(124,92,252,.2);color:var(--accent2)}
+
+/* ── Main ── */
+.main{max-width:1260px;margin:0 auto;padding:28px;position:relative;z-index:1}
+.section-header{margin-bottom:28px}
+.section-title{font-size:26px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,var(--text) 0%,var(--text2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.section-subtitle{color:var(--text2);font-size:13px;margin-top:6px;font-weight:400}
+
+/* ── Cards Grid ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px}
+
+/* ── Card ── */
+.card{background:var(--surface);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius);padding:0;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .3s}
+.card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.05)}
+.card:hover::before{opacity:1}
+.card-inner{padding:22px}
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge-release{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border:1px solid}
+.badge-model{background:rgba(124,92,252,.1);color:var(--accent2);border-color:rgba(124,92,252,.2)}
+.badge-framework{background:rgba(52,211,153,.1);color:var(--green);border-color:rgba(52,211,153,.2)}
+.badge-agent{background:rgba(244,114,182,.1);color:var(--pink);border-color:rgba(244,114,182,.2)}
+.badge-infra{background:rgba(34,211,238,.1);color:var(--cyan);border-color:rgba(34,211,238,.2)}
+.badge-research{background:rgba(192,132,252,.1);color:var(--purple);border-color:rgba(192,132,252,.2)}
+.badge-github{background:rgba(251,191,36,.1);color:var(--orange);border-color:rgba(251,191,36,.2)}
+.badge-news{background:var(--surface2);color:var(--text2);border-color:var(--border)}
+.badge-tier{font-size:10px;padding:2px 8px;border-radius:6px;background:var(--surface2);color:var(--text3);border:none;font-weight:500}
+.card-score{font-size:12px;font-weight:700;color:var(--accent2);background:var(--accent-glow);padding:3px 10px;border-radius:8px;white-space:nowrap}
+.card-title{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.2px;cursor:pointer;transition:color .2s}
+.card-title:hover{color:var(--accent2)}
+.card-summary{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.card-footer{display:flex;align-items:center;font-size:11px;color:var(--text3);font-weight:500}
+.card-footer .dot{margin:0 6px;opacity:.4}
+.card-source-name{color:var(--text2)}
+
+/* ── Card Actions ── */
+.card-actions{display:flex;align-items:center;gap:2px;padding:6px 18px 16px;justify-content:flex-start}
+.card-action{width:34px;height:34px;border-radius:50%;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s cubic-bezier(.4,0,.2,1);position:relative;flex-shrink:0}
+.card-action svg{width:16px;height:16px;flex-shrink:0;transition:transform .2s,opacity .2s}
+.card-action:hover{background:var(--surface3);color:var(--text)}
+.card-action:hover svg{transform:scale(1.1)}
+.card-action:active{transform:scale(.9)}
+.card-action:hover::after{content:attr(aria-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:10;letter-spacing:.01em}
+.card-action.act-open:hover{color:var(--blue);background:rgba(96,165,250,.08)}
+.card-action.act-like:hover{color:var(--green);background:rgba(52,211,153,.08)}
+.card-action.act-like.liked{color:var(--green);background:rgba(52,211,153,.12)}
+.card-action.act-like.liked svg{transform:scale(1.15)}
+.card-action.act-dislike:hover{color:var(--red);background:rgba(248,113,113,.08)}
+.card-action.act-dislike.disliked{color:var(--red);background:rgba(248,113,113,.12)}
+.card-action.act-dislike.disliked svg{transform:scale(1.15)}
+.card-action.act-save:hover{color:var(--orange);background:rgba(251,191,36,.08)}
+.card-action.act-save.bookmarked{color:var(--orange);background:rgba(251,191,36,.12)}
+.card-action.act-save.bookmarked svg{transform:scale(1.15)}
+.card-action.act-copy:hover{color:var(--cyan);background:rgba(34,211,238,.08)}
+.card-action.act-remove:hover{color:var(--red);background:rgba(248,113,113,.08)}
+.card-actions-spacer{flex:1}
+
+/* ── GitHub Card extras ── */
+.gh-stats{display:flex;gap:14px;margin-bottom:10px;font-size:12px;color:var(--text2)}
+.gh-stats span{display:flex;align-items:center;gap:5px}
+.gh-topic{font-size:10px;padding:2px 8px;border-radius:6px;background:var(--surface2);color:var(--text3);font-weight:500}
+.gh-quality{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 10px;border-radius:8px;font-weight:600}
+.gh-quality.high_quality{background:rgba(52,211,153,.1);color:var(--green)}
+.gh-quality.experimental{background:rgba(251,191,36,.1);color:var(--orange)}
+.gh-quality.early_stage{background:var(--surface2);color:var(--text3)}
+.gh-velocity{font-size:11px;color:var(--cyan);display:flex;align-items:center;gap:4px}
+
+/* ── Empty / Loading ── */
+.empty{text-align:center;padding:100px 20px;color:var(--text2)}
+.empty-icon{font-size:52px;margin-bottom:18px;filter:grayscale(.3)}
+.empty-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:-.2px}
+.loading{text-align:center;padding:80px;color:var(--text2)}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Onboarding Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:rgba(18,18,26,.95);backdrop-filter:blur(20px);border:1px solid var(--border2);border-radius:20px;padding:36px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.modal h2{font-size:24px;font-weight:800;margin-bottom:8px;text-align:center;letter-spacing:-.3px}
+.modal p{color:var(--text2);text-align:center;margin-bottom:20px;font-size:14px}
+.modal input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;margin-bottom:18px;font-family:inherit;transition:border-color .2s}
+.modal input:focus{outline:none;border-color:var(--accent)}
+.interest-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:24px}
+.interest-btn{padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;text-align:center;transition:all .2s;font-family:inherit}
+.interest-btn:hover{border-color:var(--border2);background:var(--surface2)}
+.interest-btn.selected{background:var(--accent-glow);border-color:rgba(124,92,252,.3);color:var(--accent2)}
+.modal-submit{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;letter-spacing:.02em}
+.modal-submit:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 8px 24px rgba(124,92,252,.3)}
+.modal-submit:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ── Profile Panel ── */
+.profile-panel{background:var(--surface);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:24px}
+.profile-panel h3{font-size:17px;font-weight:700;margin-bottom:18px;letter-spacing:-.2px}
+.pref-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:13px}
+.pref-bar .label{width:200px;color:var(--text2);font-weight:500}
+.pref-bar .bar{flex:1;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.pref-bar .bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--cyan));transition:width .4s ease}
+.pref-bar .val{width:44px;text-align:right;color:var(--text3);font-size:12px;font-weight:600}
+
+/* ── Search ── */
+.search-wrap{position:relative;flex:1;max-width:380px;margin:0 18px}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--text3);pointer-events:none;transition:color .2s}
+.search-input{width:100%;padding:8px 14px 8px 36px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;transition:all .2s;outline:none}
+.search-input::placeholder{color:var(--text3)}
+.search-input:focus{border-color:rgba(124,92,252,.4);background:var(--surface2);box-shadow:0 0 0 3px rgba(124,92,252,.08)}
+.search-input:focus+svg{color:var(--accent2)}
+.search-kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-family:inherit;pointer-events:none;transition:opacity .2s}
+.search-input:focus~.search-kbd{opacity:0}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;padding:2px;display:none;font-size:16px;line-height:1}
+.search-clear:hover{color:var(--text)}
+.search-wrap.has-query .search-kbd{display:none}
+.search-wrap.has-query .search-clear{display:block}
+.search-result-info{color:var(--text2);font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.search-result-info .highlight{color:var(--accent2);font-weight:600}
+
+/* ── Toast ── */
+.pulse-toast{font-family:'Inter',system-ui,sans-serif}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .header{padding:12px 18px;flex-wrap:wrap;gap:10px}
+  .search-wrap{order:3;max-width:100%;margin:0;flex-basis:100%}
+  .tabs{padding:8px 18px}
+  .main{padding:18px}
+  .cards{grid-template-columns:1fr}
+  .section-title{font-size:22px}
+  .search-kbd{display:none}
+}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <span>TechSage</span>
+  </div>
+  <div class="search-wrap" id="searchWrap">
+    <input class="search-input" id="searchInput" type="text" placeholder="Search articles..." autocomplete="off" oninput="handleSearch()" onkeydown="if(event.key==='Escape'){clearSearch()}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span class="search-kbd" id="searchKbd">/</span>
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">&times;</button>
+  </div>
+  <div class="header-right">
+    <span class="badge" id="articleCount">0 articles</span>
+    <button class="user-btn" id="userBtn" onclick="showProfile()">
+      <span>👤</span> <span id="usernameDisplay">Guest</span>
+    </button>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs" id="tabBar">
+  <div class="tab active" data-tab="top" onclick="switchTab('top')">🔥 Top Releases</div>
+  <div class="tab" data-tab="model" onclick="switchTab('model')">🚀 Models <span class="count" id="countModel">0</span></div>
+  <div class="tab" data-tab="framework" onclick="switchTab('framework')">🧰 Frameworks <span class="count" id="countFramework">0</span></div>
+  <div class="tab" data-tab="agent_platform" onclick="switchTab('agent_platform')">🤖 Agents <span class="count" id="countAgent">0</span></div>
+  <div class="tab" data-tab="research" onclick="switchTab('research')">📚 Research <span class="count" id="countResearch">0</span></div>
+  <div class="tab" data-tab="github_repo" onclick="switchTab('github_repo')">📦 GitHub <span class="count" id="countGithub">0</span></div>
+  <div class="tab" data-tab="general_news" onclick="switchTab('general_news')">📰 AI News <span class="count" id="countNews">0</span></div>
+  <div class="tab" data-tab="saved" onclick="switchTab('saved')">🔖 Saved <span class="count" id="countSaved">0</span></div>
+  <div class="tab" data-tab="profile" onclick="switchTab('profile')">👤 Profile</div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+  <div class="section-header">
+    <div id="sectionTitle" class="section-title">🔥 Top AI Releases Today</div>
+    <div id="sectionSubtitle" class="section-subtitle">Ranked by release priority, semantic relevance, and source authority</div>
+  </div>
+  <div id="searchResultInfo" class="search-result-info hidden"></div>
+  <div id="profilePanel" class="profile-panel hidden"></div>
+  <div id="cardContainer" class="cards"></div>
+  <div id="loadingState" class="loading hidden"><div class="spinner"></div>Loading intelligence feed…</div>
+  <div id="emptyState" class="empty hidden">
+    <div class="empty-icon">📡</div>
+    <div class="empty-title">No articles yet</div>
+    <p>TechSage is scanning AI sources. Articles will appear shortly.</p>
+  </div>
+</div>
+
+<!-- Onboarding Modal -->
+<div class="modal-overlay hidden" id="onboardingModal">
+  <div class="modal">
+    <h2>⚡ Welcome to TechSage</h2>
+    <p>AI Ecosystem Intelligence — track model releases, frameworks, agents, and research.</p>
+    <input type="text" id="onboardUsername" placeholder="Choose a username" autocomplete="off">
+    <p style="font-size:13px;margin-bottom:12px;color:var(--text2)">Select topics you want to track:</p>
+    <div class="interest-grid" id="interestGrid"></div>
+    <button class="modal-submit" id="onboardSubmit" disabled onclick="completeOnboarding()">Start Tracking</button>
+  </div>
+</div>
+
+<script>
+const API = '/api/v1';
+const CATEGORIES = [
+  "LLMs & Foundation Models","AI Agents & Assistants","AI Infrastructure & MLOps",
+  "AI Frameworks & Libraries","AI Research & Papers","AI Policy & Ethics",
+  "AI Startups & Funding","AI Applications",
+];
+const RELEASE_TYPE_META = {
+  model:          { icon:'🚀', label:'Model',         badgeClass:'badge-model' },
+  framework:      { icon:'🧰', label:'Framework',     badgeClass:'badge-framework' },
+  agent_platform: { icon:'🤖', label:'Agent',         badgeClass:'badge-agent' },
+  infra:          { icon:'⚙️', label:'Infra',          badgeClass:'badge-infra' },
+  research:       { icon:'📚', label:'Research',       badgeClass:'badge-research' },
+  github_repo:    { icon:'📦', label:'GitHub',         badgeClass:'badge-github' },
+  general_news:   { icon:'📰', label:'News',           badgeClass:'badge-news' },
+};
+const TIER_LABELS = { 1:'Official Lab', 2:'Framework', 3:'Media', 4:'GitHub' };
+
+const ICO = {
+  open:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>',
+  like:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>',
+  likeFill: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3v11z"/></svg>',
+  dislike:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/><path d="M17 2h3a2 2 0 012 2v7a2 2 0 01-2 2h-3"/></svg>',
+  disFill:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10zM17 2h3a2 2 0 012 2v7a2 2 0 01-2 2h-3V2z"/></svg>',
+  save:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>',
+  saveFill: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>',
+  copy:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>',
+  remove:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>',
+};
+
+let state = {
+  userId: localStorage.getItem('pulseai_userId'),
+  username: localStorage.getItem('pulseai_username'),
+  currentTab: 'top',
+  articles: [],
+  searchQuery: '',
+  bookmarks: new Set(JSON.parse(localStorage.getItem('pulseai_bookmarks') || '[]')),
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!state.userId) { showOnboarding(); }
+  else { document.getElementById('usernameDisplay').textContent = state.username; loadFeed(); refreshTabCounts(); }
+  setInterval(() => { loadFeed(); refreshTabCounts(); }, 60000);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+      e.preventDefault(); document.getElementById('searchInput').focus();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault(); document.getElementById('searchInput').focus();
+    }
+  });
+});
+
+let _searchTimer = null;
+function handleSearch() {
+  const input = document.getElementById('searchInput');
+  const wrap = document.getElementById('searchWrap');
+  const q = input.value.trim().toLowerCase();
+  wrap.classList.toggle('has-query', q.length > 0);
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(() => {
+    state.searchQuery = q;
+    applySearch();
+  }, 150);
+}
+
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = ''; state.searchQuery = '';
+  document.getElementById('searchWrap').classList.remove('has-query');
+  document.getElementById('searchResultInfo').classList.add('hidden');
+  renderCards(state.articles, state.currentTab === 'saved');
+}
+
+function applySearch() {
+  const q = state.searchQuery;
+  const info = document.getElementById('searchResultInfo');
+  if (!q) { info.classList.add('hidden'); renderCards(state.articles, state.currentTab === 'saved'); return; }
+  const terms = q.split(/\s+/).filter(Boolean);
+  const filtered = state.articles.filter(a => {
+    const haystack = `${a.title||''} ${a.summary||''} ${a.source||''} ${a.category||''} ${a.release_type||''} ${(a.github_topics||[]).join(' ')}`.toLowerCase();
+    return terms.every(t => haystack.includes(t));
+  });
+  info.innerHTML = `Found <span class="highlight">${filtered.length}</span> result${filtered.length!==1?'s':''} for "<span class="highlight">${escHtml(q)}</span>"`;
+  info.classList.remove('hidden');
+  if (filtered.length === 0) {
+    document.getElementById('cardContainer').innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No matches</div><p>Try different keywords or clear the search.</p></div>`;
+  } else {
+    renderCards(filtered, state.currentTab === 'saved');
+  }
+}
+
+function showOnboarding() {
+  const grid = document.getElementById('interestGrid'); grid.innerHTML = '';
+  const selected = new Set();
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('div'); btn.className = 'interest-btn'; btn.textContent = cat;
+    btn.onclick = () => { if (selected.has(cat)){selected.delete(cat);btn.classList.remove('selected')} else {selected.add(cat);btn.classList.add('selected')} document.getElementById('onboardSubmit').disabled = selected.size === 0; };
+    grid.appendChild(btn);
+  });
+  document.getElementById('onboardingModal').classList.remove('hidden');
+  window._selectedInterests = selected;
+}
+
+async function completeOnboarding() {
+  const username = document.getElementById('onboardUsername').value.trim();
+  if (!username) { alert('Please enter a username'); return; }
+  try {
+    const res = await fetch(`${API}/users`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username, interests:[...window._selectedInterests]}) });
+    const user = await res.json();
+    state.userId = user.id; state.username = username;
+    localStorage.setItem('pulseai_userId', user.id); localStorage.setItem('pulseai_username', username);
+    document.getElementById('usernameDisplay').textContent = username;
+    document.getElementById('onboardingModal').classList.add('hidden');
+    loadFeed(); refreshTabCounts();
+  } catch (e) { alert('Error: ' + e.message); }
+}
+
+function switchTab(tab) {
+  state.currentTab = tab;
+  clearSearch();
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const title = document.getElementById('sectionTitle');
+  const subtitle = document.getElementById('sectionSubtitle');
+  document.getElementById('profilePanel').classList.add('hidden');
+  const T = {
+    top:['🔥 Top AI Releases Today','Ranked by release priority, semantic relevance, and source authority'],
+    model:['🚀 Model Releases','New AI model announcements from official labs'],
+    framework:['🧰 Frameworks & Tools','Framework launches, library updates, and developer tools'],
+    agent_platform:['🤖 Agent Platforms','AI agent frameworks, orchestration platforms, and assistants'],
+    research:['📚 Research Papers','Notable AI research publications and breakthroughs'],
+    github_repo:['📦 GitHub Trending','Trending AI repositories by stars and activity'],
+    general_news:['📰 AI News','General AI ecosystem news and coverage'],
+    saved:['🔖 Saved Articles','Your bookmarked articles for later reading'],
+    profile:['👤 Your Profile','Preference weights and interaction history'],
+  };
+  const [t, s] = T[tab] || ['','']; title.textContent = t; subtitle.textContent = s;
+  if (tab === 'profile') { loadProfile(); return; }
+  if (tab === 'saved') { loadSaved(); return; }
+  loadFeed();
+}
+
+async function loadFeed() {
+  if (state.currentTab === 'profile' || state.currentTab === 'saved') return;
+  if (!state.userId) return;
+  const container = document.getElementById('cardContainer');
+  const loading = document.getElementById('loadingState');
+  const empty = document.getElementById('emptyState');
+  loading.classList.remove('hidden'); container.innerHTML = ''; empty.classList.add('hidden');
+  try {
+    let url = `${API}/users/${state.userId}/feed?limit=40`;
+    const tab = state.currentTab;
+    if (tab === 'top') url += '&max_age_days=7';
+    else if (tab === 'github_repo') url += '&content_type=github_repo&max_age_days=30';
+    else if (['model','framework','agent_platform','research','general_news'].includes(tab)) url += `&release_type=${tab}&max_age_days=30`;
+    const res = await fetch(url);
+    if (res.status === 404) { localStorage.removeItem('pulseai_userId'); localStorage.removeItem('pulseai_username'); state.userId=null; state.username=null; loading.classList.add('hidden'); showOnboarding(); return; }
+    const data = await res.json(); state.articles = data.articles || [];
+    loading.classList.add('hidden');
+    if (state.articles.length === 0) { empty.classList.remove('hidden'); return; }
+    renderCards(state.articles);
+  } catch (e) { loading.classList.add('hidden'); container.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Connection Error</div><p>${e.message}</p></div>`; }
+}
+
+async function loadSaved() {
+  const container = document.getElementById('cardContainer');
+  const loading = document.getElementById('loadingState');
+  const empty = document.getElementById('emptyState');
+  const ids = [...state.bookmarks]; updateSavedCount();
+  if (ids.length === 0) { container.innerHTML = ''; empty.querySelector('.empty-icon').textContent='🔖'; empty.querySelector('.empty-title').textContent='No saved articles'; empty.querySelector('p').textContent='Tap Save on any article to bookmark it here.'; empty.classList.remove('hidden'); return; }
+  loading.classList.remove('hidden'); container.innerHTML = ''; empty.classList.add('hidden');
+  try {
+    const res = await fetch(`${API}/articles/batch`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(ids) });
+    const data = await res.json();
+    state.articles = (data.articles||[]).map(a => ({...a, article_id:a.id, score:0}));
+    loading.classList.add('hidden');
+    if (state.articles.length === 0) { state.bookmarks.clear(); localStorage.setItem('pulseai_bookmarks','[]'); updateSavedCount(); empty.querySelector('.empty-icon').textContent='🔖'; empty.querySelector('.empty-title').textContent='No saved articles'; empty.querySelector('p').textContent='Tap Save on any article to bookmark it here.'; empty.classList.remove('hidden'); return; }
+    renderCards(state.articles, true);
+  } catch (e) { loading.classList.add('hidden'); container.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Error</div><p>${e.message}</p></div>`; }
+}
+
+function renderCards(articles, isSaved = false) {
+  const container = document.getElementById('cardContainer'); container.innerHTML = '';
+  articles.forEach((a, i) => {
+    const meta = RELEASE_TYPE_META[a.release_type] || RELEASE_TYPE_META.general_news;
+    const isGH = a.content_type === 'github_repo';
+    const isBookmarked = state.bookmarks.has(a.article_id);
+    const tierLabel = TIER_LABELS[a.source_tier] || '';
+    const displayDate = isGH ? a.created_at : a.published_at;
+    const timeAgo = displayDate ? getTimeAgo(new Date(displayDate)) : '';
+
+    let ghSection = '';
+    if (isGH) {
+      const stars = a.github_stars ? `⭐ ${formatNum(a.github_stars)}` : '';
+      const lang = a.github_language || '';
+      const topics = (a.github_topics||[]).slice(0,5).map(t=>`<span class="gh-topic">${t}</span>`).join('');
+      const qTag = a.repo_quality_tag || '';
+      const qScore = a.repo_quality_score != null ? a.repo_quality_score.toFixed(1) : '';
+      const velocity = a.star_velocity != null ? a.star_velocity.toFixed(1) : '';
+      const tagLabels = {high_quality:'🏆 High Quality',experimental:'🧪 Experimental',early_stage:'🌱 Early Stage'};
+      ghSection = `
+        <div class="gh-stats">${stars?`<span>${stars}</span>`:''} ${lang?`<span>💻 ${lang}</span>`:''} ${velocity?`<span class="gh-velocity">📈 ${velocity} ★/day</span>`:''} ${qScore?`<span>Quality: ${qScore}</span>`:''}</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap">${qTag?`<span class="gh-quality ${qTag}">${tagLabels[qTag]||qTag}</span>`:''} ${topics}</div>`;
+    }
+
+    const actions = isSaved ? `
+      <button class="card-action act-open" aria-label="Read article" onclick="window.open('${escAttr(a.url)}','_blank')">${ICO.open}</button>
+      <button class="card-action act-copy" aria-label="Copy link" onclick="copyLink('${escAttr(a.url)}')">${ICO.copy}</button>
+      <div class="card-actions-spacer"></div>
+      <button class="card-action act-remove" aria-label="Remove" onclick="removeSaved('${a.article_id}',this.closest('.card'))">${ICO.remove}</button>
+    ` : `
+      <button class="card-action act-like" aria-label="More like this" id="lk-${a.article_id}" onclick="handleLike('${a.article_id}',this)">${ICO.like}</button>
+      <button class="card-action act-dislike" aria-label="Less like this" id="dk-${a.article_id}" onclick="handleDislike('${a.article_id}',this)">${ICO.dislike}</button>
+      <button class="card-action act-save ${isBookmarked?'bookmarked':''}" aria-label="${isBookmarked?'Saved':'Save'}" id="bm-${a.article_id}" onclick="toggleBookmark('${a.article_id}')">${isBookmarked?ICO.saveFill:ICO.save}</button>
+      <button class="card-action act-copy" aria-label="Copy link" onclick="copyLink('${escAttr(a.url)}')">${ICO.copy}</button>
+      <div class="card-actions-spacer"></div>
+      <button class="card-action act-open" aria-label="Read article" onclick="window.open('${escAttr(a.url)}','_blank');recordInteraction('${a.article_id}','click')">${ICO.open}</button>
+    `;
+
+    const card = document.createElement('div'); card.className = 'card';
+    card.style.animationDelay = `${i * 0.04}s`;
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-top">
+          <div class="card-badges">
+            <span class="badge-release ${meta.badgeClass}">${meta.label}</span>
+            ${a.is_release && !isSaved ? '<span class="badge-release badge-framework" style="font-size:9px">RELEASE</span>' : ''}
+            ${tierLabel ? `<span class="badge-tier">T${a.source_tier}</span>` : ''}
+          </div>
+          ${!isSaved && a.score != null ? `<div class="card-score">${a.score.toFixed(2)}</div>` : ''}
+        </div>
+        <div class="card-title" onclick="window.open('${escAttr(a.url)}','_blank');recordInteraction('${a.article_id}','click')">${escHtml(a.title)}</div>
+        ${ghSection}
+        <div class="card-summary">${escHtml(a.summary || '')}</div>
+        <div class="card-footer">
+          <span class="card-source-name">${escHtml(a.source)}</span>
+          ${timeAgo ? `<span class="dot">·</span><span>${isGH ? 'Spotted ' : ''}${timeAgo}</span>` : ''}
+        </div>
+      </div>
+      <div class="card-actions">${actions}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+async function recordInteraction(articleId, type) {
+  if (!state.userId) return;
+  try { await fetch(`${API}/users/${state.userId}/interactions`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({article_id:articleId, interaction_type:type}) }); }
+  catch (e) { console.error('Interaction error:', e); }
+}
+
+function handleLike(articleId, btn) {
+  const d = document.getElementById(`dk-${articleId}`);
+  if (d) { d.classList.remove('disliked'); d.querySelector('svg').outerHTML = ICO.dislike; }
+  const active = btn.classList.toggle('liked');
+  btn.querySelector('svg').outerHTML = active ? ICO.likeFill : ICO.like;
+  recordInteraction(articleId, 'like');
+  showToast('Noted — more like this');
+}
+
+function handleDislike(articleId, btn) {
+  const l = document.getElementById(`lk-${articleId}`);
+  if (l) { l.classList.remove('liked'); l.querySelector('svg').outerHTML = ICO.like; }
+  const active = btn.classList.toggle('disliked');
+  btn.querySelector('svg').outerHTML = active ? ICO.disFill : ICO.dislike;
+  recordInteraction(articleId, 'dislike');
+  showToast('Got it — less like this');
+}
+
+function toggleBookmark(articleId) {
+  if (state.bookmarks.has(articleId)) { state.bookmarks.delete(articleId); recordInteraction(articleId,'share'); }
+  else { state.bookmarks.add(articleId); recordInteraction(articleId,'bookmark'); }
+  localStorage.setItem('pulseai_bookmarks', JSON.stringify([...state.bookmarks]));
+  updateSavedCount();
+  const btn = document.getElementById(`bm-${articleId}`);
+  if (btn) { const s = state.bookmarks.has(articleId); btn.classList.toggle('bookmarked',s); btn.querySelector('svg').outerHTML = s ? ICO.saveFill : ICO.save; btn.setAttribute('aria-label', s ? 'Saved' : 'Save'); }
+}
+
+function removeSaved(articleId, cardEl) {
+  state.bookmarks.delete(articleId);
+  localStorage.setItem('pulseai_bookmarks', JSON.stringify([...state.bookmarks]));
+  updateSavedCount();
+  if (cardEl) { cardEl.style.transition='opacity .3s,transform .3s'; cardEl.style.opacity='0'; cardEl.style.transform='scale(0.97)';
+    setTimeout(()=>{ cardEl.remove(); if(state.bookmarks.size===0){ const e=document.getElementById('emptyState'); e.querySelector('.empty-icon').textContent='🔖'; e.querySelector('.empty-title').textContent='No saved articles'; e.querySelector('p').textContent='Tap Save on any article to bookmark it here.'; e.classList.remove('hidden'); }}, 300); }
+}
+
+function copyLink(url) { navigator.clipboard.writeText(url).then(() => showToast('Link copied')); }
+
+function showToast(msg) {
+  const existing = document.querySelector('.pulse-toast'); if (existing) existing.remove();
+  const t = document.createElement('div'); t.className = 'pulse-toast';
+  t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:rgba(18,18,26,.9);color:#f0f0f5;padding:12px 28px;border-radius:14px;font-size:13px;font-weight:500;z-index:999;border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(16px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:0 8px 32px rgba(0,0,0,.4)';
+  t.textContent = msg; document.body.appendChild(t);
+  requestAnimationFrame(()=>{ t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; });
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(12px)'; setTimeout(()=>t.remove(),300); }, 2000);
+}
+
+function updateSavedCount() { document.getElementById('countSaved').textContent = state.bookmarks.size; }
+
+async function refreshTabCounts() {
+  try {
+    const res = await fetch(`${API}/articles/releases/summary?max_age_days=30`);
+    const c = await res.json();
+    document.getElementById('countModel').textContent = c['model']||0;
+    document.getElementById('countFramework').textContent = c['framework']||0;
+    document.getElementById('countAgent').textContent = c['agent_platform']||0;
+    document.getElementById('countResearch').textContent = c['research']||0;
+    document.getElementById('countGithub').textContent = c['github_repo']||0;
+    document.getElementById('countNews').textContent = c['general_news']||0;
+    updateSavedCount();
+    document.getElementById('articleCount').textContent = `${Object.values(c).reduce((s,n)=>s+n,0)} articles`;
+  } catch (e) { console.error('Tab count error:', e); }
+}
+
+async function loadProfile() {
+  if (!state.userId) return;
+  const panel = document.getElementById('profilePanel');
+  document.getElementById('cardContainer').innerHTML = '';
+  try {
+    const res = await fetch(`${API}/users/${state.userId}/stats`); const stats = await res.json();
+    const prefs = stats.category_preferences || {}; const maxVal = Math.max(...Object.values(prefs), 0.01);
+    let bars = '';
+    Object.entries(prefs).sort((a,b)=>b[1]-a[1]).forEach(([cat,val])=>{
+      const pct = Math.round((val/maxVal)*100);
+      bars += `<div class="pref-bar"><div class="label">${cat}</div><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div><div class="val">${(val*100).toFixed(0)}%</div></div>`;
+    });
+    panel.innerHTML = `
+      <h3>👤 ${state.username}</h3>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:18px">${stats.interaction_count} interactions · ${stats.has_embedding_centroid ? 'Embedding centroid active' : 'Building centroid…'}</p>
+      <h3 style="margin-bottom:14px">Topic Preferences</h3>
+      ${bars || '<p style="color:var(--text2)">Interact with articles to build preferences.</p>'}
+      <div style="margin-top:24px;padding:18px;background:var(--surface2);border-radius:12px;font-size:12px;color:var(--text3)">
+        <strong style="color:var(--text2)">TechSage Ranking Formula</strong><br>
+        Score = 0.40 × ReleasePriority + 0.25 × EmbeddingSimilarity + 0.20 × Recency + 0.10 × SourceTier + 0.05 × CategoryAffinity
+      </div>`;
+    panel.classList.remove('hidden');
+  } catch (e) { panel.innerHTML = `<p style="color:var(--red)">Error: ${e.message}</p>`; panel.classList.remove('hidden'); }
+}
+
+function showProfile() { switchTab('profile'); }
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function escAttr(s) { return s.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+function formatNum(n) { return n >= 1000 ? (n/1000).toFixed(1)+'k' : n; }
+function getTimeAgo(date) {
+  const m = Math.floor((Date.now()-date.getTime())/60000);
+  if (m<1) return 'just now'; if (m<60) return `${m}m ago`;
+  const h = Math.floor(m/60); if (h<24) return `${h}h ago`;
+  return `${Math.floor(h/24)}d ago`;
+}
+</script>
+</body>
+</html>

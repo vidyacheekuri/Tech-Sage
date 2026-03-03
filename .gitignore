@@ -1,0 +1,30 @@
+# Environment
+.env
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build / dist
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Logs
+*.log
+logs/
