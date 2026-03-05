@@ -51,7 +51,7 @@ TechSage is a production-grade ML system that continuously ingests, classifies, 
 │  ┌──────────────────────────────────────────────────────┐    │
 │  │  FastAPI + Frontend Dashboard                          │    │
 │  │  Tabs: Models | Frameworks | Agents | Research |       │    │
-│  │        GitHub Trending | AI News | Profile             │    │
+│  │        GitHub | AI News | Ask (RAG) | Saved | Profile  │    │
 │  └──────────────────────────────────────────────────────┘    │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -60,11 +60,22 @@ TechSage is a production-grade ML system that continuously ingests, classifies, 
 
 | Model | Purpose | Dimension |
 |-------|---------|-----------|
-| `sentence-transformers/all-MiniLM-L6-v2` | Sentence embeddings for deduplication + personalization | 384-dim |
+| `sentence-transformers/all-MiniLM-L6-v2` | Sentence embeddings for deduplication + personalization + RAG retrieval | 384-dim |
 | `facebook/bart-large-mnli` | Zero-shot classification (topic + release detection) | — |
-| `facebook/bart-large-cnn` | Abstractive summarization (~60 words) | — |
+| `facebook/bart-large-cnn` | Abstractive summarization (~120–150 words) | — |
+| `HuggingFaceTB/SmolLM2-360M-Instruct` | RAG chat generation (lazy-loaded on first query, fast on CPU) | — |
 
-All models are loaded **once** at startup via the `ModelRegistry` singleton.
+All models are loaded at startup via the `ModelRegistry` singleton, except the RAG LLM which loads on first chat request.
+
+## RAG Chat (Retrieval Augmented Generation)
+
+Ask questions about the AI ecosystem in natural language. Flow:
+1. **Embed** the question with the same sentence embedding model
+2. **Retrieve** top-K articles by cosine similarity in pgvector
+3. **Generate** an answer with SmolLM2 grounded in the retrieved context
+4. **Cite sources** — each answer links to the articles it drew from
+
+Access via the **💬 Ask** tab in the dashboard or `POST /api/v1/chat`.
 
 ## Two-Pass Classification
 
@@ -117,6 +128,29 @@ uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 
 Open http://localhost:8000 for the dashboard.
 
+### Automatic article fetching (without keeping the server running)
+
+Ingestion normally runs inside the web server (every 5 min for news, every 6 hours for GitHub). To fetch articles **even when the server is off**, use one of these:
+
+**Option A — Standalone scheduler** (long-running process):
+```bash
+python -m scheduler.run_standalone
+```
+Runs in the foreground. Use `nohup` or `screen` to background it:
+```bash
+nohup python -m scheduler.run_standalone >> /tmp/techsage-scheduler.log 2>&1 &
+```
+
+**Option B — Cron** (no long-running process):
+```bash
+# News every 5 minutes
+*/5 * * * * cd /path/to/TechSage && python -m scheduler.run_once --news >> /tmp/techsage-news.log 2>&1
+
+# GitHub every 6 hours
+0 */6 * * * cd /path/to/TechSage && python -m scheduler.run_once --github >> /tmp/techsage-github.log 2>&1
+```
+Replace `/path/to/TechSage` with your project directory.
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
@@ -159,7 +193,9 @@ TechSage/
 │   ├── interaction_tracker.py # Interaction logging + profile updates
 │   └── user_profile.py       # User preference management
 ├── scheduler/
-│   └── ingestion_job.py      # Pipeline orchestration + scheduling
+│   ├── ingestion_job.py      # Pipeline orchestration + scheduling
+│   ├── run_standalone.py     # Standalone scheduler (no web server)
+│   └── run_once.py           # One-shot ingestion (for cron)
 ├── static/
 │   └── index.html            # Frontend dashboard
 ├── .env                      # Environment configuration

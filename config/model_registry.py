@@ -9,13 +9,15 @@ This is critical for production:
 - Models are multi-GB; reloading per request would be catastrophic for latency.
 - GPU/CPU memory is allocated once and reused.
 - Startup is the only slow phase; inference is fast after that.
+
+RAG model is loaded lazily on first chat request to avoid slowing startup.
 """
 
 import logging
 import time
 
 from sentence_transformers import SentenceTransformer
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 
 from config.settings import get_settings
 
@@ -30,11 +32,34 @@ class ModelRegistry:
         self.classifier_pipeline = None
         self.summarizer_model = None
         self.summarizer_tokenizer = None
+        self.rag_model = None
+        self.rag_tokenizer = None
         self._loaded = False
+        self._rag_loaded = False
 
     @property
     def is_loaded(self) -> bool:
         return self._loaded
+
+    @property
+    def rag_model_loaded(self) -> bool:
+        return self._rag_loaded
+
+    def load_rag_model(self) -> None:
+        """Load RAG chat model lazily (called on first /chat request)."""
+        if self._rag_loaded:
+            return
+        settings = get_settings()
+        logger.info("Loading RAG model: %s (this may take a minute on first use)...", settings.rag_model)
+        start = time.time()
+        self.rag_tokenizer = AutoTokenizer.from_pretrained(settings.rag_model)
+        self.rag_model = AutoModelForCausalLM.from_pretrained(
+            settings.rag_model,
+            torch_dtype="auto",
+            low_cpu_mem_usage=True,
+        )
+        self._rag_loaded = True
+        logger.info("RAG model loaded in %.1fs", time.time() - start)
 
     def load_all(self) -> None:
         """Load all models. Call this once during application startup."""

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     classifier_model: str = "facebook/bart-large-mnli"
     summarizer_model: str = "facebook/bart-large-cnn"
+    rag_model: str = "HuggingFaceTB/SmolLM2-360M-Instruct"
     embedding_dim: int = 384
     duplicate_threshold: float = 0.85
 

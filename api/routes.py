@@ -20,6 +20,9 @@ from sqlalchemy.orm import Session
 from api.schemas import (
     ArticleListResponse,
     ArticleResponse,
+    ChatRequest,
+    ChatResponse,
+    ChatSource,
     EngineerArticleResponse,
     EngineerFeedResponse,
     EngineerScoreBreakdown,
@@ -114,6 +117,18 @@ def get_articles_batch(
     return ArticleListResponse(
         articles=[ArticleResponse.model_validate(a) for a in articles],
         total=len(articles),
+    )
+
+
+@router.post("/chat", response_model=ChatResponse, tags=["RAG"])
+def chat(req: ChatRequest, db: Session = Depends(get_db)):
+    """RAG chat: ask questions about the AI ecosystem; answers are grounded in retrieved articles."""
+    from rag.query import rag_query
+
+    result = rag_query(db, req.message)
+    return ChatResponse(
+        answer=result["answer"],
+        sources=[ChatSource(**s) for s in result["sources"]],
     )
 
 

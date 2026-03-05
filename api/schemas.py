@@ -196,3 +196,18 @@ class HealthResponse(BaseModel):
     status: str
     models_loaded: bool
     database_connected: bool
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=1000)
+
+
+class ChatSource(BaseModel):
+    title: str
+    url: str
+    source: str
+
+
+class ChatResponse(BaseModel):
+    answer: str
+    sources: list[ChatSource]

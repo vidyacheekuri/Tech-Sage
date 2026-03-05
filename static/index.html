@@ -154,6 +154,23 @@ a{color:var(--accent2);text-decoration:none}
 .search-result-info{color:var(--text2);font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .search-result-info .highlight{color:var(--accent2);font-weight:600}
 
+/* ── Chat ── */
+.chat-panel{display:flex;flex-direction:column;min-height:400px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;min-height:280px}
+.chat-msg{max-width:85%;align-self:flex-start;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.6}
+.chat-msg.user{align-self:flex-end;background:var(--accent-glow);border:1px solid rgba(124,92,252,.3);color:var(--text)}
+.chat-msg.bot{background:var(--surface2);border:1px solid var(--border);color:var(--text2)}
+.chat-msg .sources{margin-top:12px;font-size:12px;color:var(--text3)}
+.chat-msg .sources a{color:var(--accent2);margin-right:12px}
+.chat-input-row{display:flex;gap:10px;padding:16px;border-top:1px solid var(--border);background:rgba(255,255,255,.02)}
+.chat-input{flex:1;padding:12px 16px;border-radius:12px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.chat-input:focus{border-color:var(--accent)}
+.chat-send{padding:12px 24px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.chat-send:hover:not(:disabled){opacity:.9;transform:translateY(-1px)}
+.chat-send:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.chat-placeholder{text-align:center;color:var(--text3);font-size:14px;padding:60px 20px}
+.chat-placeholder strong{color:var(--text2);display:block;margin-bottom:8px}
+
 /* ── Toast ── */
 .pulse-toast{font-family:'Inter',system-ui,sans-serif}
 
@@ -203,6 +220,7 @@ a{color:var(--accent2);text-decoration:none}
   <div class="tab" data-tab="github_repo" onclick="switchTab('github_repo')">📦 GitHub <span class="count" id="countGithub">0</span></div>
   <div class="tab" data-tab="general_news" onclick="switchTab('general_news')">📰 AI News <span class="count" id="countNews">0</span></div>
   <div class="tab" data-tab="saved" onclick="switchTab('saved')">🔖 Saved <span class="count" id="countSaved">0</span></div>
+  <div class="tab" data-tab="chat" onclick="switchTab('chat')">💬 Ask</div>
   <div class="tab" data-tab="profile" onclick="switchTab('profile')">👤 Profile</div>
 </div>
 
@@ -214,6 +232,13 @@ a{color:var(--accent2);text-decoration:none}
   </div>
   <div id="searchResultInfo" class="search-result-info hidden"></div>
   <div id="profilePanel" class="profile-panel hidden"></div>
+  <div id="chatPanel" class="chat-panel hidden">
+    <div id="chatMessages" class="chat-messages"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Ask about AI releases, frameworks, research..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+      <button id="chatSend" class="chat-send" onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
   <div id="cardContainer" class="cards"></div>
   <div id="loadingState" class="loading hidden"><div class="spinner"></div>Loading intelligence feed…</div>
   <div id="emptyState" class="empty hidden">
@@ -360,7 +385,20 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   const title = document.getElementById('sectionTitle');
   const subtitle = document.getElementById('sectionSubtitle');
-  document.getElementById('profilePanel').classList.add('hidden');
+  const profilePanel = document.getElementById('profilePanel');
+  const chatPanel = document.getElementById('chatPanel');
+  const cardContainer = document.getElementById('cardContainer');
+  const loadingState = document.getElementById('loadingState');
+  const emptyState = document.getElementById('emptyState');
+  const searchResultInfo = document.getElementById('searchResultInfo');
+
+  profilePanel.classList.add('hidden');
+  chatPanel.classList.add('hidden');
+  cardContainer.classList.remove('hidden');
+  loadingState.classList.add('hidden');
+  emptyState.classList.add('hidden');
+  searchResultInfo.classList.remove('hidden');
+
   const T = {
     top:['🔥 Top AI Releases Today','Ranked by release priority, semantic relevance, and source authority'],
     model:['🚀 Model Releases','New AI model announcements from official labs'],
@@ -370,16 +408,73 @@ function switchTab(tab) {
     github_repo:['📦 GitHub Trending','Trending AI repositories by stars and activity'],
     general_news:['📰 AI News','General AI ecosystem news and coverage'],
     saved:['🔖 Saved Articles','Your bookmarked articles for later reading'],
+    chat:['💬 Ask TechSage','RAG-powered Q&A over the AI ecosystem corpus'],
     profile:['👤 Your Profile','Preference weights and interaction history'],
   };
   const [t, s] = T[tab] || ['','']; title.textContent = t; subtitle.textContent = s;
   if (tab === 'profile') { loadProfile(); return; }
   if (tab === 'saved') { loadSaved(); return; }
+  if (tab === 'chat') {
+    cardContainer.classList.add('hidden');
+    searchResultInfo.classList.add('hidden');
+    chatPanel.classList.remove('hidden');
+    initChatUI();
+    return;
+  }
   loadFeed();
 }
 
+function initChatUI() {
+  const msgs = document.getElementById('chatMessages');
+  if (msgs.children.length === 0) {
+    msgs.innerHTML = '<div class="chat-placeholder"><strong>💬 RAG-powered Q&A</strong>Ask questions about AI releases, frameworks, research, and more. Answers are grounded in the TechSage article corpus.<br><br>Try: "What model releases happened this week?" or "Summarize the top framework updates"</div>';
+  }
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('chatSend');
+  const msgs = document.getElementById('chatMessages');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  btn.disabled = true;
+
+  const placeholder = msgs.querySelector('.chat-placeholder');
+  if (placeholder) placeholder.remove();
+
+  const userDiv = document.createElement('div');
+  userDiv.className = 'chat-msg user';
+  userDiv.textContent = msg;
+  msgs.appendChild(userDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const botDiv = document.createElement('div');
+  botDiv.className = 'chat-msg bot';
+  botDiv.innerHTML = '<span style="opacity:.6">Thinking…</span>';
+  msgs.appendChild(botDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const res = await fetch(`${API}/chat`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:msg}) });
+    const data = await res.json();
+    let html = escHtml(data.answer);
+    if (data.sources && data.sources.length > 0) {
+      html += '<div class="sources">Sources: ';
+      html += data.sources.map((s,i) => `<a href="${s.url}" target="_blank" rel="noopener">[${i+1}] ${escHtml(s.title)}</a>`).join(' ');
+      html += '</div>';
+    }
+    botDiv.innerHTML = html;
+  } catch (e) {
+    botDiv.innerHTML = `Error: ${escHtml(e.message)}`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+  btn.disabled = false;
+}
+
 async function loadFeed() {
-  if (state.currentTab === 'profile' || state.currentTab === 'saved') return;
+  if (state.currentTab === 'profile' || state.currentTab === 'saved' || state.currentTab === 'chat') return;
   if (!state.userId) return;
   const container = document.getElementById('cardContainer');
   const loading = document.getElementById('loadingState');
